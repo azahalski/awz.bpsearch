@@ -91,6 +91,9 @@ class awz_bpsearch extends CModule
         if(!$this->errors && !$DB->TableExists(implode('_', explode('.',$this->MODULE_ID)).'_permission')) {
             $this->errors = $DB->RunSQLBatch($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . $this->MODULE_ID . "/install/db/".$connection->getType()."/access.sql");
         }
+        if(!$this->errors && !$DB->TableExists('b_'.implode('_', explode('.',$this->MODULE_ID)).'_bpsearch_bpindex')) {
+            $this->errors = $DB->RunSQLBatch($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . $this->MODULE_ID . "/install/db/".$connection->getType()."/install.sql");
+        }
         if (!$this->errors) {
             return true;
         } else {
@@ -106,6 +109,9 @@ class awz_bpsearch extends CModule
         $this->errors = false;
         if (!$this->errors) {
             $this->errors = $DB->RunSQLBatch($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . $this->MODULE_ID . "/install/db/" . $connection->getType() . "/unaccess.sql");
+        }
+        if (!$this->errors) {
+            $this->errors = $DB->RunSQLBatch($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . $this->MODULE_ID . "/install/db/" . $connection->getType() . "/uninstall.sql");
         }
         if (!$this->errors) {
             return true;
