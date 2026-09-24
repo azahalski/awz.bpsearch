@@ -17,7 +17,7 @@ class BpIndexList extends IList implements IParams {
     public function __construct($params){
         global $POST_RIGHT;
         if(AccessController::can(0, ActionDictionary::ACTION_SBP_VIEW)){
-            $POST_RIGHT = "W";
+            $POST_RIGHT = "R";
             \Awz\BpSearch\BpIndexTable::reIndex();
         }
         parent::__construct($params);

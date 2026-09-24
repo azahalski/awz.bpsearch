@@ -30,7 +30,8 @@ require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_aft
 
 
 
-if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() && $request->get('Update'))
+if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() && $request->get('Update')
+        && check_bitrix_sessid())
 {
     if($request->get('reindex')=='Y'){
         Option::set($module_id, 'last_id_index', "0", "");
@@ -39,13 +40,18 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
     //Option::set($module_id, "test", $request->get("test")=='Y' ? 'Y' : 'N', "");
 }
 
-$lastId = (int) Option::get($module_id, 'last_id_index', "0", "");
-if(!$lastId && Loader::includeModule('bizproc')){
-    \Awz\BpSearch\BpIndexTable::reIndexAll();
+if (AccessController::isEditSettings()
+        && $request->getRequestMethod() === 'POST'
+        && check_bitrix_sessid())
+{
+    $lastId = (int) Option::get($module_id, 'last_id_index', "0", "");
+    if (!$lastId && Loader::includeModule('bizproc')) {
+        \Awz\BpSearch\BpIndexTable::reIndexAll();
     \CAdminMessage::ShowMessage(array('TYPE'=>'OK',
         'MESSAGE'=>Loc::getMessage('AWZ_BPSEARCH_OPT_REINDEX_MSG')));
+    }
+    \Awz\BpSearch\BpIndexTable::reIndex();
 }
-\Awz\BpSearch\BpIndexTable::reIndex();
 
 $aTabs = array();
 
@@ -62,6 +68,7 @@ $tabControl->Begin();
 ?>
     <style>.adm-workarea option:checked {background-color: rgb(206, 206, 206);}</style>
     <form method="POST" action="<?=$saveUrl?>" id="FORMACTION">
+        <?=bitrix_sessid_post()?>
         <?
         $tabControl->BeginNextTab();
         ?>
