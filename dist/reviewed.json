@@ -1,0 +1,201 @@
+{
+  "success": true,
+  "requestId": "awz.bpsearch-1790285356",
+  "data": {
+    "vulnerabilities": [
+      {
+        "file": "lib/traits/serialize.php",
+        "line": "10",
+        "type": "Insecure Deserialization",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization. Метод serialize() (строка 10) использует unserialize без allowed_classes, что позволяет хранение произвольных сериализованных объектов. Если значение записывается через Option::set из доступного источника (настройки модуля), атакующий с правом редактирования настроек может записать произвольную сериализованную структуру. Метод unserialize защищён ['allowed_classes'=>false], что снижает риск RCE.",
+        "recommendation": "Использовать json_encode/json_decode вместо serialize для данных, которые не требуют PHP-объектов. Если serialize необходим — всегда использовать ['allowed_classes' => false] и на записи.",
+        "fix": "Before:\npublic static function serialize($value){\n    return serialize($value);\n}\n\nAfter:\npublic static function serialize($value){\n    return json_encode($value);\n}",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        },
+        "partner_disposition": {
+          "status": "accepted_risk",
+          "note": "",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-09-24T21:33:19+00:00"
+        }
+      },
+      {
+        "file": "lib/access/model/usermodel.php",
+        "line": "25,59",
+        "type": "Command Injection",
+        "severity": "low",
+        "description": "Подозрение: Command Execution через ORM-запрос. Метод exec() (строки 25, 59) вызывается на объекте запроса пользователя. Это вызов ORM-слоя Bitrix, а не прямая OS-команда. Код выглядит безопасно, так как используется встроенный механизм Bitrix ORM без конкатенации пользовательского ввода.",
+        "recommendation": "Код безопасен при использовании ORM-методов Bitrix. Убедиться, что параметры запроса проходят валидацию.",
+        "fix": "Код не требует изменений, если параметры передаются через параметризированные запросы ORM.",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        },
+        "partner_disposition": {
+          "status": "accepted_risk",
+          "note": "",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-09-24T21:33:19+00:00"
+        }
+      },
+      {
+        "file": "lib/adminpages/bpindexlist.php",
+        "line": "40",
+        "type": "Command Injection",
+        "severity": "low",
+        "description": "Подозрение: Command Execution через ORM-запрос. Метод exec() (строка 40) вызывается на объекте userQuery. Это ORM-слой Bitrix, а не прямая OS-команда. Код безопасен, так как параметры фильтрации задаются через IParams-интерфейс, а не напрямую из $_REQUEST.",
+        "recommendation": "Продолжать использовать ORM-параметризированные запросы. Избегать прямой конкатенации в SQL.",
+        "fix": "Код не требует изменений при использовании ORM-слоя.",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        },
+        "partner_disposition": {
+          "status": "accepted_risk",
+          "note": "",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-09-24T21:33:19+00:00"
+        }
+      },
+      {
+        "file": "lib/access/public.php",
+        "line": "13",
+        "type": "Open Redirect",
+        "severity": "medium",
+        "description": "Подозрение: Open Redirect. LocalRedirect('/local/rm.app/') (строка 13) использует хардкод-путь, что безопасно. Однако файл имеет define('NOT_CHECK_PERMISSIONS', true) и доступен для не-администраторов с проверкой isAdmin(). Если isAdmin() возвращает true для достаточного набора прав, то redirect ведёт на внутренний URL, что безопасно.",
+        "recommendation": "Текущий код безопасен, так как LocalRedirect использует фиксированный путь. Не изменять на динамический back_url без валидации.",
+        "fix": "Код безопасен при использовании фиксированного пути в LocalRedirect().",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "medium",
+          "changed": true,
+          "category": "open-redirect-unclear-source",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "validate-source-and-allowlist",
+          "confidence": "low",
+          "rationale": "Left as medium pending confirmation of whether the redirect target is request-controlled or only editable by trusted administrators."
+        },
+        "partner_disposition": {
+          "status": "accepted_risk",
+          "note": "",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-09-24T21:33:19+00:00"
+        }
+      },
+      {
+        "file": "lib/bpindex.php",
+        "line": "63,79",
+        "type": "Insecure Deserialization",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization через data modifier. В getMap() (строка 63 в оригинале, здесь строка с PARAMS) используются addSaveDataModifier с serialize и addFetchDataModifier с unserialize. Данные хранятся в БД через serialize. unserialize защищён allowed_classes=false, что предотвращает POP-цепочки. Риск низкий, так как данные в БД управляются внутренним кодом модуля, а не пользователем.",
+        "recommendation": "Заменить serialize/json_encode на JSON для данных, не требующих PHP-объектов. Текущая защита allowed_classes=false снижает риск.",
+        "fix": "Before:\n->addSaveDataModifier(function ($value){\n    return self::serialize($value);\n})->addFetchDataModifier(function ($value) {\n    return self::unserialize($value);\n})\n\nAfter:\n->addSaveDataModifier(function ($value){\n    return self::serializeJson($value);\n})->addFetchDataModifier(function ($value) {\n    return self::unserializeJson($value);\n})",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        },
+        "partner_disposition": {
+          "status": "accepted_risk",
+          "note": "",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-09-24T21:33:19+00:00"
+        }
+      }
+    ],
+    "summary": "Обнаружено 5 подозрений в 5 файлах при анализе 61 файла модуля. Максимальная severity: low. Все находки имеют низкую степень опасности: deserialization защищён allowed_classes=false, ORM-вызовы не являются прямой OS-инъекцией, redirect использует фиксированный путь.",
+    "scannedFiles": 61,
+    "riskLevel": "medium",
+    "auditedFiles": [
+      "install/components/bpsearch.config.permissions/ajax.php",
+      "lib/bpindex.php",
+      "lib/traits/serialize.php",
+      "options.php",
+      "lib/access/public.php",
+      "admin/bpindex_list.php",
+      "lib/adminpages/bpindexlist.php",
+      "lib/access/accesscontroller.php",
+      "lib/access/handlers.php"
+    ],
+    "reviewSummary": {
+      "reviewedAt": "2026-09-25",
+      "method": "BUS-aware triage: preserve original finding fields except severity, add reviewed node with old severity and rationale.",
+      "totals": {
+        "vulnerabilities": 5,
+        "changedSeverity": 1,
+        "unchangedSeverity": 4
+      },
+      "rawSeverityCounts": {
+        "low": 5
+      },
+      "reviewedSeverityCounts": {
+        "low": 4,
+        "medium": 1
+      },
+      "currentScope": {
+        "total": 5,
+        "rawSeverityCounts": {
+          "low": 5
+        },
+        "reviewedSeverityCounts": {
+          "low": 4,
+          "medium": 1
+        },
+        "reviewedCategories": {
+          "kept-as-reported": 4,
+          "open-redirect-unclear-source": 1
+        }
+      },
+      "historicalUpdatePackages": {
+        "total": 0,
+        "rawSeverityCounts": {},
+        "reviewedSeverityCounts": {},
+        "reviewedCategories": {}
+      },
+      "caveats": [
+        "Type, file, line, description, recommendation and fix are preserved from the source journal.",
+        "Severity is replaced with reviewed triage severity."
+      ]
+    },
+    "feedbackSummary": {
+      "updatedAt": "2026-09-24T21:33:19+00:00",
+      "applied": 5
+    }
+  }
+}
